@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+<script>
+    var config = {
+      type: 'doughnut',
+      data: {
+        datasets: [{
+          data: {{ data|safe }},
+          backgroundColor: [
+            '#ff4419', '#00ff2a', '#ffc800'
+          ],
+          label: 'Frequency'
+        }],
+        labels: {{ labels|safe }}
+      },
+      options: {
+        responsive: true
+      }
+    };
+
+    window.onload = function() {
+      var ctx = document.getElementById('pie-chart').getContext('2d');
+      window.myPie = new Chart(ctx, config);
+    };
+
+  </script>
+<style>
+h1{
+  font-size: 3em;
+}
+.side-by-side-one{
+    width:100%;
+    height:auto;
+    margin-top:100px;
+    padding:1%;
+}
+.side-by-side-two{
+    width:100%;
+    height:auto;
+    margin-top:500px;
+    padding:1%;
+}
+#leftbox1 {
+    float:left;
+    width:15%;
+    height:500px;
+}
+#rightbox1{
+    float:right;
+    width:85%;
+    height:500px;
+}
+#leftbox2 {
+    float:left;
+    width:75%;
+    height:500px;
+}
+#rightbox2{
+    float:right;
+    width:25%;
+    height:500px;
+}
+</style>
+<body style="background-color:rgb(190,227,234);">
+<header class="w3-display-container w3-content w3-center" style="max-width:1500px">
+  <img class="w3-image" src="{% static 'images/cyber_back.jpg' %}" alt="Me" width="1500" height="400">
+  <div class="w3-display-middle w3-padding-large w3-border w3-wide w3-text-light-grey w3-center">
+    <h1 class="w3-hide-medium w3-hide-small w3-xxxlarge"><strong>{{ username }}</strong></h1>
+    <h5 class="w3-hide-large" style="white-space:nowrap"><strong>{{ username }}</strong></h5>
+    <h3 class="w3-hide-medium w3-hide-small">PHOTOGRAPHER</h3>
+  </div>
+
+  <!-- Navbar (placed at the bottom of the header image) -->
+  <div class="w3-bar w3-light-grey w3-round w3-display-bottommiddle w3-hide-small" style="bottom:-16px">
+    <a href="#" class="w3-bar-item w3-button">User</a>
+    <a href="#Frequency" class="w3-bar-item w3-button">Frequency</a>
+    <a href="#top" class="w3-bar-item w3-button">Top Words</a>
+  </div>
+</header>
+
+<!-- Navbar on small screens -->
+<div class="w3-center w3-light-grey w3-padding-16 w3-hide-large w3-hide-medium">
+<div class="w3-bar w3-light-grey">
+  <a href="#" class="w3-bar-item w3-button">User</a>
+  <a href="#Frequency" class="w3-bar-item w3-button">Frequency</a>
+  <a href="#top" class="w3-bar-item w3-button">Top Words</a>
+</div>
+</div>
+<!-- Page content -->
+<div class="w3-content w3-padding-large w3-margin-top " id="Frequency">
+  <div class="side-by-side-one">
+    <div id="leftbox1">
+        <h1 >Frequency of the words</h1>
+    </div>
+    <div id="rightbox1">
+        <div id="container" >
+            <canvas id="pie-chart"></canvas>
+        </div>
+    </div>
+  </div>
+
+</div>
+<div class="w3-content w3-padding-large w3-margin-top" id="top">
+  <div class="side-by-side-two">
+    <div id="leftbox2">
+        <div id="container2" >
+            <canvas id="pie-chart2"></canvas>
+        </div>
+    </div>
+    <div id="rightbox2">
+      <h1>Top words</h1>
+    </div>
+  </div>
+
+</div>
+
+</body>
+
+</html>
