@@ -88,6 +88,7 @@ def get_data(name):
                                "text": text,
                                "Date": t["created_at"]
                                })
+
     df = pd.DataFrame.from_dict(sentiments)
     df["text"] = dc.clean_tweets(df["text"])
     scores = []

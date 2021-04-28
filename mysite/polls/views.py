@@ -19,9 +19,9 @@ def results(request):
     print(name)
     res=master.get_data(name)
 
-    is_bully = False
+    is_bully = "isn't a CyberBully"
     if(res[0]=="Bully"):
-        is_bully=True
+        is_bully= "is a CyberBully"
 
     labels = []
     data = []
