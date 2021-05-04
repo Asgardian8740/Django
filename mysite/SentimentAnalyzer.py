@@ -4,7 +4,6 @@ import string
 import codecs
 from inspect import getsourcefile
 
-
 B_INCR = 0.293
 B_DECR = -0.293
 
@@ -12,7 +11,8 @@ C_INCR = 0.733
 N_SCALAR = -0.74
 
 NEGATE = \
-    ["aint", "arent", "cannot", "cant", "couldnt", "darent", "didnt", "doesnt",
+    ["नहीं", "इनकार", "नहीं हैं ", "एक नहीं", "कोई नहीं", "नहीं हैं", "बिल्कुल नहीं", "कुछ भी नहीं", "न", "नही", "तनिक भी नहीं",
+     "aint", "arent", "cannot", "cant", "couldnt", "darent", "didnt", "doesnt",
      "ain't", "aren't", "can't", "couldn't", "daren't", "didn't", "doesn't",
      "dont", "hadnt", "hasnt", "havent", "isnt", "mightnt", "mustnt", "neither",
      "don't", "hadn't", "hasn't", "haven't", "isn't", "mightn't", "mustn't",
@@ -21,9 +21,18 @@ NEGATE = \
      "oughtn't", "shan't", "shouldn't", "uh-uh", "wasn't", "weren't",
      "without", "wont", "wouldnt", "won't", "wouldn't", "rarely", "seldom", "despite"]
 
-
 BOOSTER_DICT = \
-    {"absolutely": B_INCR, "amazingly": B_INCR, "awfully": B_INCR,
+    {"पूर्ण रूप से": B_INCR,  "आश्चर्यजनक": B_INCR,  "भय से": B_INCR, "पूरी तरह": B_INCR,  "महत्वपूर्ण": B_INCR,
+     "काफी": B_INCR,"निश्चित": B_INCR,  "गहरा": B_INCR,  "पुतला": B_INCR,  "विशाल": B_INCR,  "अत्यंत": B_INCR,
+     "पूरी तरह से": B_INCR,"असाधारण": B_INCR,  "ख़ासकर": B_INCR, "चरम": B_INCR, "जमकर": B_INCR, "फ़्लिपिन": B_INCR,
+     "तड़पता हुआ": B_INCR,  "फ्रिकिन": B_INCR,  "छोटा": B_INCR,"फ्रिगिन": B_INCR,"कमीने": B_INCR,  "कमबख्त": B_INCR,
+     "भगोड़ा": B_INCR,  "ठगना": B_INCR,  "हेला": B_INCR,  "अत्यधिक": B_INCR,"बेहद": B_INCR,
+     "अविश्वसनीय रूप से": B_INCR,  "तीव्रता से": B_INCR, "प्रमुख": B_INCR,  "मुख्यत:": B_INCR,  "अधिक": B_INCR,  "अधिकांश": B_INCR,
+     "विशेष रूप से": B_INCR, "विशुद्ध रूप से": B_INCR,  "क्या सच में": B_INCR,  "ध्यान से देखने से": B_INCR,
+     "तोह फिर": B_INCR, "काफी हद तक": B_INCR, "बिलकुल": B_INCR,  "संपूर्ण": B_INCR,   "भयानक": B_INCR,
+     "अविश्वसनीय": B_INCR, "असामान्य रूप से": B_INCR,  "पूर्ण": B_INCR,
+     "बहुत": B_INCR, "लगभग": B_DECR,  "मुश्किल से": B_DECR,  "अभी काफी": B_DECR,
+     "absolutely": B_INCR, "amazingly": B_INCR, "awfully": B_INCR,
      "completely": B_INCR, "considerable": B_INCR, "considerably": B_INCR,
      "decidedly": B_INCR, "deeply": B_INCR, "effing": B_INCR, "enormous": B_INCR, "enormously": B_INCR,
      "entirely": B_INCR, "especially": B_INCR, "exceptional": B_INCR, "exceptionally": B_INCR,
@@ -55,7 +64,7 @@ SENTIMENT_LADEN_IDIOMS = {"cut the mustard": 2, "hand to mouth": -2,
 
 SPECIAL_CASES = {"the shit": 3, "the bomb": 3, "bad ass": 1.5, "badass": 1.5, "bus stop": 0.0,
                  "yeah right": -2, "kiss of death": -1.5, "to die for": 3,
-                 "beating heart": 3.1, "broken heart": -2.9}
+                 "beating heart": 3.1, "broken heart": -2.9, }
 
 
 # #Static methods# #
@@ -196,6 +205,7 @@ class SentimentIntensityAnalyzer(object):
             if not line:
                 continue
             (word, measure) = line.strip().split('\t')[0:2]
+            # print("float value    " + measure)
             lex_dict[word] = float(measure)
         return lex_dict
 
@@ -342,6 +352,8 @@ class SentimentIntensityAnalyzer(object):
         threetwo = "{0} {1}".format(words_and_emoticons_lower[i - 3], words_and_emoticons_lower[i - 2])
 
         sequences = [onezero, twoonezero, twoone, threetwoone, threetwo]
+
+        print(sequences)
 
         for seq in sequences:
             if seq in SPECIAL_CASES:

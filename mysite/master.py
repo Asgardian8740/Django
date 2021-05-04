@@ -111,11 +111,15 @@ def get_data(name):
     pd.options.display.max_columns = None
     pd.options.display.max_rows = None
 
+
+
     word_cloud(df["text"])
     print(isBully(compound_list))
     print(getPositiveCount(compound_list))
     print(getNeutralCount(compound_list))
     print(getNegativeCount(compound_list))
     res=[isBully(compound_list),getPositiveCount(compound_list),getNegativeCount(compound_list),getNeutralCount(compound_list)]
+
+
     return res
 
