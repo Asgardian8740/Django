@@ -18,7 +18,14 @@ NEGATE = \
      "neednt", "needn't", "never", "none", "nope", "nor", "not", "nothing", "nowhere",
      "oughtnt", "shant", "shouldnt", "uhuh", "wasnt", "werent",
      "oughtn't", "shan't", "shouldn't", "uh-uh", "wasn't", "weren't",
-     "without", "wont", "wouldnt", "won't", "wouldn't", "rarely", "seldom", "despite",]
+     "without", "wont", "wouldnt", "won't", "wouldn't", "rarely", "seldom", "despite",
+     "नहीं", "इनकार", "नहीं हैं ", "एक नहीं", "कोई नहीं", "नहीं हैं", "बिल्कुल नहीं", "कुछ भी नहीं", "न", "नही",
+     "तनिक भी नहीं","अभ्यस्त", "उह उह", "एकदम चमक", "कभी कभी", "कभी नहीं", "कहीं भी नहीं", "कुछ नहीजी",
+     "के बग़ैर", "के बावजूद","कोई नहीं", "खिचड़ी भाषा का", "न","नही सकता", "नहीं", "नहीं कर रहे हैं", "नहीं कर सकते हैं",
+     "नहीं कर सका", "नहीं करना चाहिए", "नहीं करेगा","नहीं किया", "नहीं की जरूरत है",
+     "नहीं चढ़े, जिस", "नहीं था", "नहीं थे", "नहीं है", "नहीं हो सकता है", "नहीं होगा", "फ्लॉप", "मना है",
+     "शायद ही कभी", "सके", "हिम्मत नहीं  कर सकता",
+     ]
 
 
 H_LIST = \
@@ -101,7 +108,7 @@ def _negation_in_groups(words_and_emoticons, i):
 
     sequences = [onezero, twoonezero, twoone, threetwoone, threetwo]
     for seq in sequences:
-        print(seq)
+        # print(seq)
         if seq in H_LIST:
             return True
     return False
@@ -181,8 +188,7 @@ class SentiText(object):
 
 class SentimentIntensityAnalyzer(object):
 
-
-    def __init__(self, lexicon_file="vader_lexicon.txt", emoji_lexicon="emoji_utf8_lexicon.txt"):
+    def __init__(self, lexicon_file="vader_lexicon_hindi.txt", emoji_lexicon="emoji_utf8_lexicon.txt"):
         _this_module_file_path_ = os.path.abspath(getsourcefile(lambda: 0))
         lexicon_full_filepath = os.path.join(os.path.dirname(_this_module_file_path_), lexicon_file)
         with codecs.open(lexicon_full_filepath, encoding='utf-8') as f:
@@ -199,10 +205,10 @@ class SentimentIntensityAnalyzer(object):
         lex_dict = {}
         for line in self.lexicon_full_filepath.rstrip('\n').split('\n'):
             if not line:
-                continue
+                break
             (word, measure) = line.strip().split('\t')[0:2]
-            # print("float value    " + measure)
-            lex_dict[word] = float(measure)
+            # print(word +" ---> " + measure)
+            lex_dict[word.strip()] = float(measure)
         return lex_dict
 
     def make_emoji_dict(self):
@@ -333,7 +339,7 @@ class SentimentIntensityAnalyzer(object):
 
         sequences = [onezero, twoonezero, twoone, threetwoone, threetwo]
 
-        print(sequences)
+        # print(sequences)
 
         for seq in sequences:
             if seq in SPECIAL_CASES:

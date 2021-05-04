@@ -23,8 +23,8 @@ def sentiment_analyzer_scores(text, engl=True):
     if engl:
         trans = text
     score = analyser.polarity_scores(trans)
-    print(text)
-    print(score)
+    # print("text   " + text)
+    # print(score)
     return score
 
 
@@ -106,13 +106,14 @@ def get_data(name):
                            "Neutral": neu,
                            "Compound": compound,
                            })
+        print_test(df['text'][i])
+
     sentiments_score = pd.DataFrame.from_dict(scores)
     df = df.join(sentiments_score)
     pd.options.display.max_columns = None
     pd.options.display.max_rows = None
 
-
-
+    # print(df.head(100))
     word_cloud(df["text"])
     print(isBully(compound_list))
     print(getPositiveCount(compound_list))
@@ -121,5 +122,15 @@ def get_data(name):
     res=[isBully(compound_list),getPositiveCount(compound_list),getNegativeCount(compound_list),getNeutralCount(compound_list)]
 
 
+
     return res
 
+
+
+def print_test(text, engl=True):
+    analyser = vad.SentimentIntensityAnalyzer()
+    if engl:
+        trans = text
+    score = analyser.polarity_scores(trans)
+    print("text   " + text)
+    print(score)
