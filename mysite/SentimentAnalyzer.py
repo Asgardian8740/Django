@@ -19,8 +19,12 @@ NEGATE = \
      "neednt", "needn't", "never", "none", "nope", "nor", "not", "nothing", "nowhere",
      "oughtnt", "shant", "shouldnt", "uhuh", "wasnt", "werent",
      "oughtn't", "shan't", "shouldn't", "uh-uh", "wasn't", "weren't",
-     "without", "wont", "wouldnt", "won't", "wouldn't", "rarely", "seldom", "despite"]
+     "without", "wont", "wouldnt", "won't", "wouldn't", "rarely", "seldom", "despite",]
 
+H_LIST = \
+    ["अभ्यस्त","उह उह","एकदम चमक","कभी कभी","कभी नहीं","कहीं भी नहीं","कुछ नहीजी","के बग़ैर","के बावजूद","कोई नहीं","खिचड़ी भाषा का","न",
+     "नही सकता","नहीं","नहीं कर रहे हैं","नहीं कर सकते हैं","नहीं कर सका","नहीं करना चाहिए","नहीं करेगा","नहीं किया","नहीं की जरूरत है",
+     "नहीं चढ़े, जिस","नहीं था","नहीं थे","नहीं है","नहीं हो सकता है","नहीं होगा","फ्लॉप","मना है","शायद ही कभी","सके","हिम्मत नहीं  कर सकता",]
 
 BOOSTER_DICT = \
     {"absolutely": B_INCR, "amazingly": B_INCR, "awfully": B_INCR,
@@ -46,24 +50,16 @@ BOOSTER_DICT = \
      "scarce": B_DECR, "scarcely": B_DECR, "slight": B_DECR, "slightly": B_DECR, "somewhat": B_DECR,
      "sort of": B_DECR, "sorta": B_DECR, "sortof": B_DECR, "sort-of": B_DECR}
 
-# check for sentiment laden idioms that do not contain lexicon words (future work, not yet implemented)
-SENTIMENT_LADEN_IDIOMS = {"cut the mustard": 2, "hand to mouth": -2,
-                          "back handed": -2, "blow smoke": -2, "blowing smoke": -2,
-                          "upper hand": 1, "break a leg": 2,
-                          "cooking with gas": 2, "in the black": 2, "in the red": -2,
-                          "on the ball": 2, "under the weather": -2}
+
 
 SPECIAL_CASES = {"the shit": 3, "the bomb": 3, "bad ass": 1.5, "badass": 1.5, "bus stop": 0.0,
                  "yeah right": -2, "kiss of death": -1.5, "to die for": 3,
                  "beating heart": 3.1, "broken heart": -2.9}
 
 
-# #Static methods# #
 
 def negated(input_words, include_nt=True):
-    """
-    Determine if input contains negation words
-    """
+
     input_words = [str(w).lower() for w in input_words]
     neg_words = []
     neg_words.extend(NEGATE)
@@ -74,18 +70,34 @@ def negated(input_words, include_nt=True):
         for word in input_words:
             if "n't" in word:
                 return True
-    '''if "least" in input_words:
-        i = input_words.index("least")
-        if i > 0 and input_words[i - 1] != "at":
-            return True'''
+
+    return False
+
+def _negation_in_groups(words_and_emoticons, i):
+    words_and_emoticons_lower = [str(w).lower() for w in words_and_emoticons]
+
+    onezero = "{0} {1}".format(words_and_emoticons_lower[i - 1], words_and_emoticons_lower[i])
+
+    twoonezero = "{0} {1} {2}".format(words_and_emoticons_lower[i - 2],
+                                          words_and_emoticons_lower[i - 1], words_and_emoticons_lower[i])
+
+    twoone = "{0} {1}".format(words_and_emoticons_lower[i - 2], words_and_emoticons_lower[i - 1])
+
+    threetwoone = "{0} {1} {2}".format(words_and_emoticons_lower[i - 3],
+                                           words_and_emoticons_lower[i - 2], words_and_emoticons_lower[i - 1])
+
+    threetwo = "{0} {1}".format(words_and_emoticons_lower[i - 3], words_and_emoticons_lower[i - 2])
+
+    sequences = [onezero, twoonezero, twoone, threetwoone, threetwo]
+    for seq in sequences:
+        print(seq)
+        if seq in H_LIST:
+            return True
     return False
 
 
 def normalize(score, alpha=15):
-    """
-    Normalize the score to be between -1 and 1 using an alpha that
-    approximates the max expected value
-    """
+
     norm_score = score / math.sqrt((score * score) + alpha)
     if norm_score < -1.0:
         return -1.0
@@ -96,11 +108,7 @@ def normalize(score, alpha=15):
 
 
 def allcap_differential(words):
-    """
-    Check whether just some words in the input are ALL CAPS
-    :param list words: The words to inspect
-    :returns: `True` if some but not all items in `words` are ALL CAPS
-    """
+
     is_different = False
     allcap_words = 0
     for word in words:
@@ -142,38 +150,26 @@ class SentiText(object):
             text = str(text).encode('utf-8')
         self.text = text
         self.words_and_emoticons = self._words_and_emoticons()
-        # doesn't separate words from\
-        # adjacent punctuation (keeps emoticons & contractions)
+
         self.is_cap_diff = allcap_differential(self.words_and_emoticons)
 
     @staticmethod
     def _strip_punc_if_word(token):
-        """
-        Removes all trailing and leading punctuation
-        If the resulting string has two or fewer characters,
-        then it was likely an emoticon, so return original string
-        (ie ":)" stripped would be "", so just return ":)"
-        """
+
         stripped = token.strip(string.punctuation)
         if len(stripped) <= 2:
             return token
         return stripped
 
     def _words_and_emoticons(self):
-        """
-        Removes leading and trailing puncutation
-        Leaves contractions and most emoticons
-            Does not preserve punc-plus-letter emoticons (e.g. :D)
-        """
+
         wes = self.text.split()
         stripped = list(map(self._strip_punc_if_word, wes))
         return stripped
 
 
 class SentimentIntensityAnalyzer(object):
-    """
-    Give a sentiment intensity score to sentences.
-    """
+
 
     def __init__(self, lexicon_file="vader_lexicon.txt", emoji_lexicon="emoji_utf8_lexicon.txt"):
         _this_module_file_path_ = os.path.abspath(getsourcefile(lambda: 0))
@@ -188,9 +184,7 @@ class SentimentIntensityAnalyzer(object):
         self.emojis = self.make_emoji_dict()
 
     def make_lex_dict(self):
-        """
-        Convert lexicon file to a dictionary
-        """
+
         lex_dict = {}
         for line in self.lexicon_full_filepath.rstrip('\n').split('\n'):
             if not line:
@@ -200,9 +194,7 @@ class SentimentIntensityAnalyzer(object):
         return lex_dict
 
     def make_emoji_dict(self):
-        """
-        Convert emoji lexicon file to a dictionary
-        """
+
         emoji_dict = {}
         for line in self.emoji_full_filepath.rstrip('\n').split('\n'):
             (emoji, description) = line.strip().split('\t')[0:2]
@@ -210,17 +202,11 @@ class SentimentIntensityAnalyzer(object):
         return emoji_dict
 
     def polarity_scores(self, text):
-        """
-        Return a float for sentiment strength based on the input text.
-        Positive values are positive valence, negative value are negative
-        valence.
-        """
-        # convert emojis to their textual descriptions
+
         text_no_emoji = ""
         prev_space = True
         for chr in text:
             if chr in self.emojis:
-                # get the textual description
                 description = self.emojis[chr]
                 if not prev_space:
                     text_no_emoji += ' '
@@ -237,7 +223,6 @@ class SentimentIntensityAnalyzer(object):
         words_and_emoticons = sentitext.words_and_emoticons
         for i, item in enumerate(words_and_emoticons):
             valence = 0
-            # check for vader_lexicon words that may be used as modifiers or negations
             if item.lower() in BOOSTER_DICT:
                 sentiments.append(valence)
                 continue
@@ -259,13 +244,10 @@ class SentimentIntensityAnalyzer(object):
         words_and_emoticons = sentitext.words_and_emoticons
         item_lowercase = item.lower()
         if item_lowercase in self.lexicon:
-            # get the sentiment valence
             valence = self.lexicon[item_lowercase]
 
-            # check for "no" as negation for an adjacent lexicon item vs "no" as its own stand-alone lexicon item
             if item_lowercase == "no" and i != len(words_and_emoticons) - 1 and words_and_emoticons[
                 i + 1].lower() in self.lexicon:
-                # don't use valence of "no" as a lexicon item. Instead set it's valence to 0.0 and negate the next item
                 valence = 0.0
             if (i > 0 and words_and_emoticons[i - 1].lower() == "no") \
                     or (i > 1 and words_and_emoticons[i - 2].lower() == "no") \
@@ -273,7 +255,6 @@ class SentimentIntensityAnalyzer(object):
                 "or", "nor"]):
                 valence = self.lexicon[item_lowercase] * N_SCALAR
 
-            # check if sentiment laden word is in ALL CAPS (while others aren't)
             if item.isupper() and is_cap_diff:
                 if valence > 0:
                     valence += C_INCR
@@ -281,9 +262,7 @@ class SentimentIntensityAnalyzer(object):
                     valence -= C_INCR
 
             for start_i in range(0, 3):
-                # dampen the scalar modifier of preceding words and emoticons
-                # (excluding the ones that immediately preceed the item) based
-                # on their distance from the current item.
+
                 if i > start_i and words_and_emoticons[i - (start_i + 1)].lower() not in self.lexicon:
                     s = scalar_inc_dec(words_and_emoticons[i - (start_i + 1)], valence, is_cap_diff)
                     if start_i == 1 and s != 0:
@@ -300,7 +279,6 @@ class SentimentIntensityAnalyzer(object):
         return sentiments
 
     def _least_check(self, valence, words_and_emoticons, i):
-        # check for negation case using "least"
         if i > 1 and words_and_emoticons[i - 1].lower() not in self.lexicon \
                 and words_and_emoticons[i - 1].lower() == "least":
             if words_and_emoticons[i - 2].lower() != "at" and words_and_emoticons[i - 2].lower() != "very":
@@ -312,7 +290,6 @@ class SentimentIntensityAnalyzer(object):
 
     @staticmethod
     def _but_check(words_and_emoticons, sentiments):
-        # check for modification in sentiment due to contrastive conjunction 'but'
         words_and_emoticons_lower = [str(w).lower() for w in words_and_emoticons]
         if 'but' in words_and_emoticons_lower:
             bi = words_and_emoticons_lower.index('but')
@@ -329,6 +306,7 @@ class SentimentIntensityAnalyzer(object):
     @staticmethod
     def _special_idioms_check(valence, words_and_emoticons, i):
         words_and_emoticons_lower = [str(w).lower() for w in words_and_emoticons]
+
         onezero = "{0} {1}".format(words_and_emoticons_lower[i - 1], words_and_emoticons_lower[i])
 
         twoonezero = "{0} {1} {2}".format(words_and_emoticons_lower[i - 2],
@@ -365,22 +343,18 @@ class SentimentIntensityAnalyzer(object):
                 valence = valence + BOOSTER_DICT[n_gram]
         return valence
 
-    @staticmethod
-    def _sentiment_laden_idioms_check(valence, senti_text_lower):
-        # Future Work
-        # check for sentiment laden idioms that don't contain a lexicon word
-        idioms_valences = []
-        for idiom in SENTIMENT_LADEN_IDIOMS:
-            if idiom in senti_text_lower:
-                print(idiom, senti_text_lower)
-                valence = SENTIMENT_LADEN_IDIOMS[idiom]
-                idioms_valences.append(valence)
-        if len(idioms_valences) > 0:
-            valence = sum(idioms_valences) / float(len(idioms_valences))
-        return valence
+
+
+
+
 
     @staticmethod
     def _negation_check(valence, words_and_emoticons, start_i, i):
+
+        if _negation_in_groups(words_and_emoticons,i):
+            valence=valence*N_SCALAR
+            return valence
+
         words_and_emoticons_lower = [str(w).lower() for w in words_and_emoticons]
         if start_i == 0:
             if negated([words_and_emoticons_lower[i - (start_i + 1)]]):  # 1 word preceding lexicon word (w/o stopwords)
@@ -403,12 +377,11 @@ class SentimentIntensityAnalyzer(object):
             elif words_and_emoticons_lower[i - 3] == "without" and \
                     (words_and_emoticons_lower[i - 2] == "doubt" or words_and_emoticons_lower[i - 1] == "doubt"):
                 valence = valence
-            elif negated([words_and_emoticons_lower[i - (start_i + 1)]]):  # 3 words preceding the lexicon word position
+            elif negated([words_and_emoticons_lower[i - (start_i + 1)]]):
                 valence = valence * N_SCALAR
         return valence
 
     def _punctuation_emphasis(self, text):
-        # add emphasis from exclamation points and question marks
         ep_amplifier = self._amplify_ep(text)
         qm_amplifier = self._amplify_qm(text)
         punct_emph_amplifier = ep_amplifier + qm_amplifier
@@ -416,24 +389,19 @@ class SentimentIntensityAnalyzer(object):
 
     @staticmethod
     def _amplify_ep(text):
-        # check for added emphasis resulting from exclamation points (up to 4 of them)
         ep_count = text.count("!")
         if ep_count > 4:
             ep_count = 4
-        # (empirically derived mean sentiment intensity rating increase for
-        # exclamation points)
         ep_amplifier = ep_count * 0.292
         return ep_amplifier
 
     @staticmethod
     def _amplify_qm(text):
-        # check for added emphasis resulting from question marks (2 or 3+)
         qm_count = text.count("?")
         qm_amplifier = 0
         if qm_count > 1:
             if qm_count <= 3:
-                # (empirically derived mean sentiment intensity rating increase for
-                # question marks)
+
                 qm_amplifier = qm_count * 0.18
             else:
                 qm_amplifier = 0.96
@@ -441,7 +409,6 @@ class SentimentIntensityAnalyzer(object):
 
     @staticmethod
     def _sift_sentiment_scores(sentiments):
-        # want separate positive versus negative sentiment scores
         pos_sum = 0.0
         neg_sum = 0.0
         neu_count = 0
@@ -457,7 +424,6 @@ class SentimentIntensityAnalyzer(object):
     def score_valence(self, sentiments, text):
         if sentiments:
             sum_s = float(sum(sentiments))
-            # compute and add emphasis from punctuation in text
             punct_emph_amplifier = self._punctuation_emphasis(text)
             if sum_s > 0:
                 sum_s += punct_emph_amplifier
@@ -465,7 +431,6 @@ class SentimentIntensityAnalyzer(object):
                 sum_s -= punct_emph_amplifier
 
             compound = normalize(sum_s)
-            # discriminate between positive, negative and neutral sentiment scores
             pos_sum, neg_sum, neu_count = self._sift_sentiment_scores(sentiments)
 
             if pos_sum > math.fabs(neg_sum):

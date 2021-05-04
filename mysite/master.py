@@ -19,12 +19,12 @@ def initialize():
 
 
 def sentiment_analyzer_scores(text, engl=True):
-
     analyser = vad.SentimentIntensityAnalyzer()
     if engl:
         trans = text
-
     score = analyser.polarity_scores(trans)
+    print(text)
+    print(score)
     return score
 
 

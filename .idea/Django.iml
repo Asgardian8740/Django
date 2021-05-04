@@ -6,9 +6,9 @@
       <sourceFolder url="file://$MODULE_DIR$/mysite/polls/analyser" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/mysite/polls" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/mysite/analyser" isTestSource="false" />
-      <excludeFolder url="file://$MODULE_DIR$/venv" />
+      <sourceFolder url="file://$MODULE_DIR$/mysite" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.7" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.7 (Django)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
